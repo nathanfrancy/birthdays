@@ -1,6 +1,6 @@
 <?php
 
-require('data-access/general.php');
+require_once('data-access/dao.php');
 
 $connection = connect_db();
 
