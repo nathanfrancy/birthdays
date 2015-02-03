@@ -10,11 +10,10 @@ set_magic_quotes_runtime(0);
 
 function connect_db() {
 	
-	$connection_array = parse_ini_file("connection.ini");
-    $host = $connection_array['host'];
-    $username = $connection_array['username'];
-    $password = $connection_array['password'];
-    $db = $connection_array['db'];
+    $host = "localhost";
+    $username = "root";
+    $password = "root";
+    $db = "birthdays";
 
 	$link = new mysqli($host, $username, $password, $db) or trigger_error($link->error);
 	return $link;
@@ -99,7 +98,16 @@ function getBirthdaysForUser($userid) {
     $birthdays = array();
 
     $link = connect_db();
-    $sql = "SELECT * FROM `birthdates` WHERE `user_id` = ?";
+    $sql = "SELECT * FROM `birthdates` WHERE `user_id` = ? ORDER BY MONTH(birthdate), DAYOFMONTH(birthdate)";
+    $sql = "SELECT * 
+,CASE WHEN BirthdayThisYear>=NOW() THEN BirthdayThisYear ELSE BirthdayThisYear + INTERVAL 1 YEAR END AS NextBirthday
+FROM (
+    SELECT * 
+    ,birthdate - INTERVAL YEAR(birthdate) YEAR + INTERVAL YEAR(NOW()) YEAR AS BirthdayThisYear
+    FROM birthdates WHERE user_id = ?
+) AS bdv
+ORDER BY NextBirthday";
+
     $stmt = $link->stmt_init();
     $stmt->prepare($sql);
     $stmt->bind_param('i', $userid);
