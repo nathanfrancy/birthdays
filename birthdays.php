@@ -9,8 +9,7 @@ if (isset($_GET['id'])) {
 
     // Allocate these different types of birthdays into arrays
     $today = $birthdays['today'];
-    $this_month = $birthdays['this_month'];
-    $other = $birthdays['other'];
+    $upcoming = $birthdays['upcoming'];
     ?>
 
     <!doctype html>
@@ -29,17 +28,17 @@ if (isset($_GET['id'])) {
                 }
             ?>
             
-            <h3>This Month's Birthdays</h3>
+            <h3>Upcoming's Birthdays</h3>
             <?php
-                for ($i = 0; $i < count($this_month); $i++) {
-                    echo $this_month[$i]['name'];
+                for ($i = 0; $i < count($upcoming); $i++) {
+                    echo $upcoming[$i]['name']."<br>";
                 }
             ?>
             
             <h3>Other Birthdays</h3>
             <?php
                 for ($i = 0; $i < count($other); $i++) {
-                    echo $other[$i]['name'];
+                    echo $other[$i]['name']."<br>";
                 }
             ?>
 

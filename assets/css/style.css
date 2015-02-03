@@ -1,0 +1,7 @@
+#alert-container {
+	display: none;
+	width: 100%;
+	position: fixed;
+	bottom: 0;
+	pointer-events: none;
+}

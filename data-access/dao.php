@@ -22,7 +22,7 @@ function connect_db() {
 
 function insertBirthday($name, $birthdate, $phonenumber, $user_id) {
 	$link = connect_db();
-	$sql = "INSERT INTO  `birthdates` (`name`, `birthdate`, `phonenumber`, `user_id`) VALUES ()";
+	$sql = "INSERT INTO  `birthdates` (`name`, `birthdate`, `phonenumber`, `user_id`) VALUES (?,?,?,?)";
 	$stmt = $link->stmt_init();
 	$stmt->prepare($sql);
 	$stmt->bind_param('sssi', 
@@ -35,7 +35,7 @@ function insertBirthday($name, $birthdate, $phonenumber, $user_id) {
 	mysqli_stmt_close($stmt);
 	$link->close();
 	
-	return "true";
+	return $id;
 }
 
 
@@ -56,7 +56,6 @@ function getAllUsers() {
         $user['name'] = $row['name'];
         $user['username'] = $row['username'];
         $user['email'] = $row['email'];
-        $user['phonenumber'] = $row['phonenumber'];
         array_push($users, $user);
         $user = null;
     }
@@ -83,7 +82,6 @@ function getSingleUser($id) {
         $user['name'] = $row['name'];
         $user['username'] = $row['username'];
         $user['email'] = $row['email'];
-        $user['phonenumber'] = $row['phonenumber'];
     }
 	mysqli_stmt_close($stmt);
 	
@@ -94,7 +92,7 @@ function getSingleUser($id) {
 function getBirthdaysForUser($userid) {
     $response = null;
     $array_today = array();
-    $array_thismonth = array();
+    $array_upcoming = array();
     $array_other = array();
 
     // Get the current id and all the birthdays
@@ -126,9 +124,11 @@ function getBirthdaysForUser($userid) {
 
     $temp_birthday = null;
     for ($i = 0; $i < count($birthdays); $i++) {
+
         // Capture all the details of this birthday
-        $this_birthmonth = stripLeadingZero(date('m', $birthdays[$i]['birthdate']));
-        $this_birthday = stripLeadingZero(date('j', $birthdays[$i]['birthdate']));
+        $this_birthmonth = date('m', strtotime($birthdays[$i]['birthdate']));
+        $this_birthday = date('j', strtotime($birthdays[$i]['birthdate']));
+
         $this_id = $birthdays[$i]['id'];
         $this_name = $birthdays[$i]['name'];
         $this_phonenumber = $birthdays[$i]['phonenumber'];
@@ -138,53 +138,37 @@ function getBirthdaysForUser($userid) {
         $temp_birthday['birthday'] = $birthdays[$i]['birthdate'];
         $temp_birthday['phonenumber'] = $this_phonenumber;
 
-            // Check if the months match
-        if ($today_month == $this_birthmonth) {
-
-                // Check if the months and days match (if so, today is their birthday!)
-            if ($today_day == $this_birthday) {
-                array_push($array_today, $temp_birthday);
-            }
-            else {
-                // The months still match
-                array_push($array_thismonth, $temp_birthday);
+        // Check if today is the birthday
+        if ( ($today_day == $this_birthday) && ($today_month == $this_birthmonth) ) {
+            array_push($array_today, $temp_birthday);
+        }
+        // Check if this month
+        else if ($today_month == $this_birthmonth) {
+            // Make sure the birthday hasn't already passed
+            if ($this_birthday > $today_day) {
+                array_push($array_upcoming, $temp_birthday);
             }
         }
-        else { // Nothing matches
+        else if ( $today_month+1 == $this_birthmonth) {
+            array_push($array_upcoming, $temp_birthday);
+        }
+        else {
             array_push($array_other, $temp_birthday);
         }
 
         $temp_birthday = null;
     }
 
-    /*
-    for ($i = 0; $i < count($array_today); $i++) {
-        echo $array_today[$i]['name'];
-    }*/
+    // Add today's birthdays to response
     $response['today'] = $array_today;
 
-    /*
-    for ($i = 0; $i < count($array_thismonth); $i++) {
-        echo $array_thismonth[$i]['name'];
-    }*/
-    $response['this_month'] = $array_thismonth;
+    // Add upcoming birthdays to response
+    $response['upcoming'] = $array_upcoming;
 
-    /*
-    for ($i = 0; $i < count($array_other); $i++) {
-        echo $array_other[$i]['name'];
-    }*/
+    // Add other birthdays to response
     $response['other'] = $array_other;
     
-    $response['message'] = "Here are your birthdays.";
-    
     return $response;
-}
-
-function stripLeadingZero($str) {
-    if ($str[0] === "0") {
-        return $str[1];
-    }
-    return $str;
 }
 
 ?>
