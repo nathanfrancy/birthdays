@@ -1,6 +1,6 @@
 app.controller('HomeCtrl', function ($scope, $log, $location, birthdayFactory, alertService) {
 
-    birthdayFactory.getBirthdaysForUser(1)
+    birthdayFactory.getBirthdaysForUser()
         .success(function (data) {
         	$scope.birthdates = data;
 
@@ -25,13 +25,34 @@ app.controller('HomeCtrl', function ($scope, $log, $location, birthdayFactory, a
 app.controller('AddCtrl', function ($scope, $log, $location, birthdayFactory, alertService) {
 
     $scope.insertBirthday = function(birthday) {
-    	birthdayFactory.insertBirthday(birthday, birthday.user_id)
-	        .success(function (data) {
-	        	alertService.alert("Successfully inserted birthday.", "success", 3);
-	        	$location.path("#/home");
-	        })
-	        .error(function (error) {
-	            alertService.alert("Couldn't insert birthday.", "danger", 3);
-	        });
+        birthdayFactory.insertBirthday(birthday)
+            .success(function (data) {
+                alertService.alert("Successfully inserted birthday.", "success", 3);
+                $location.path("#/home");
+            })
+            .error(function (error) {
+                alertService.alert("Couldn't insert birthday.", "danger", 3);
+            });
+    }
+});
+
+app.controller('EditCtrl', function ($scope, $log, $location, $routeParams, birthdayFactory, alertService) {
+    birthdayFactory.getSingleBirthday($routeParams.id)
+        .success(function (data) {
+            $scope.birthday = data;
+        })
+        .error(function (error) {
+            alertService.alert("Couldn't load birthday.", "danger", 3);
+        });
+
+    $scope.submitEdit = function(birthday) {
+        birthdayFactory.editBirthday(birthday)
+            .success(function (data) {
+                alertService.alert("Successfully edited birthday.", "success", 3);
+                $location.path("#/home");
+            })
+            .error(function (error) {
+                alertService.alert("Couldn't save birthday.", "danger", 3);
+            });
     }
 });

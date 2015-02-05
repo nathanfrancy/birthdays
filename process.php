@@ -11,9 +11,18 @@ if ($task !== null && $task !== "") {
     // Get all users in the system
     $users = getAllUsers();
 
+    if ($task == "test") {
+        echo "<h1>All Users Array</h1>";
+        echo "<pre>";
+        echo print_r($users);
+        echo "</pre>";
+        echo "<hr>";
+        echo "<h1>User Data</h1>";
+    }
+
     // Loop through each user
     for ($u = 0; $u < count($users); $u++) {
-        $user_id = $users[$u];
+        $user_id = $users[$u]['id'];
 
         // Get the necessary resources
         $user = getSingleUser($user_id);
@@ -24,6 +33,7 @@ if ($task !== null && $task !== "") {
         $upcoming = $birthdays['upcoming'];
 
         if ($task === "test") {
+            echo "<h2>" . $user['name'] . " [". $user['id'] ."]</h2>";
             echo "<pre>";
             echo print_r($birthdays);
             echo "</pre>";
@@ -58,10 +68,12 @@ if ($task !== null && $task !== "") {
         }
         else { $email_body .= "<i>No other birthdays this month.</i>\n\n\n<hr>"; }
         
-        $email_body .= "\r\n\r\n<i>Processed: " . $today_date . "</i>";
+        $email_body .= "\r\n\r\n<i>Processed: " . $today_date . "</i><hr>";
         $email_body .= "</body></html>";
 
         if ($task === "test") {
+            echo "<hr>";
+            echo "<p style='font-family: courier;'>". $user['name'] ."'s Birthday Email:</p>";
             echo $email_body;
         }
 

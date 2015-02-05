@@ -16,6 +16,11 @@ $routeProvider
           controller: 'AddCtrl',
           templateUrl: 'partials/add.html'
         })
+    .when('/edit/:id',
+      {
+          controller: 'EditCtrl',
+          templateUrl: 'partials/edit.html'
+      })
     
     .otherwise({redirectTo: '/home'})
 });

@@ -16,6 +16,7 @@
       <ul class="nav navbar-nav">
         <li><a href="#/home">Home</a></li>
         <li><a href="#/add">Add Birthday</a></li>
+        <li><a href="logout.php">Logout</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

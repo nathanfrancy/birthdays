@@ -7,19 +7,74 @@ if ( (session_status() == PHP_SESSION_NONE) || (session_id() == '') ) {
 date_default_timezone_set('America/Chicago');
 set_magic_quotes_runtime(0);
 
+require("connection.php");
 
-function connect_db() {
-	
-    $host = "localhost";
-    $username = "root";
-    $password = "root";
-    $db = "birthdays";
-
-	$link = new mysqli($host, $username, $password, $db) or trigger_error($link->error);
-	return $link;
+function validate($input_username, $input_password) {
+    // Connect and initialize sql template
+    $link = connect_db();
+    $sql = "SELECT id FROM user WHERE BINARY username = ? AND BINARY password = ?";
+    
+    // Create prepared statement and bind passed in variables username and password
+    $stmt = $link->stmt_init();
+    $stmt->prepare($sql);
+    $stmt->bind_param('ss', $link->real_escape_string($input_username), sha1($input_password));
+    $userid = $stmt->execute();
+    $userid = 0;
+    $stmt->bind_result($userid);
+    $stmt->fetch();
+    
+    mysqli_stmt_close($stmt);
+    return $userid;
 }
 
-function insertBirthday($name, $birthdate, $phonenumber, $user_id) {
+function checkPassword($try) {
+    $password_encrypted = null;
+    
+    // Connect and initialize sql and prepared statement template
+    $link = connect_db();
+    $sql = "SELECT password FROM user WHERE id = ? LIMIT 1";
+    $stmt = $link->stmt_init();
+    $stmt->prepare($sql);
+    $stmt->bind_param('i', $_SESSION['auth_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // bind the result to $theBook for json encoding
+    while ($row = $result->fetch_array(MYSQLI_BOTH)) {
+        $password_encrypted = $row['password'];
+    }
+    mysqli_stmt_close($stmt);
+
+    if (sha1($try) === $password_encrypted) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+function getSingleBirthday($id) {
+    $birthday = null;
+    
+    // Connect and initialize sql and prepared statement template
+    $link = connect_db();
+    $sql = "SELECT * FROM `birthdates` WHERE id = ? LIMIT 1";
+    $stmt = $link->stmt_init();
+    $stmt->prepare($sql);
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    while ($row = $result->fetch_array(MYSQLI_BOTH)) {
+        $birthday['id'] = $row['id'];
+        $birthday['name'] = $row['name'];
+        $birthday['birthdate'] = $row['birthdate'];
+        $birthday['phonenumber'] = $row['phonenumber'];
+        $birthday['user_id'] = $row['user_id'];
+    }
+    mysqli_stmt_close($stmt);
+    return $birthday;
+}
+
+function insertBirthday($name, $birthdate, $phonenumber) {
 	$link = connect_db();
 	$sql = "INSERT INTO  `birthdates` (`name`, `birthdate`, `phonenumber`, `user_id`) VALUES (?,?,?,?)";
 	$stmt = $link->stmt_init();
@@ -28,13 +83,30 @@ function insertBirthday($name, $birthdate, $phonenumber, $user_id) {
                       $link->real_escape_string($name), 
                       $link->real_escape_string($birthdate), 
                       $link->real_escape_string($phonenumber), 
-                      $user_id);
+                      $_SESSION['auth_id']);
 	$stmt->execute();
 	$id = $link->insert_id;
 	mysqli_stmt_close($stmt);
 	$link->close();
 	
 	return $id;
+}
+
+function editBirthday($id, $name, $birthdate, $phonenumber) {
+    $link = connect_db();
+    $sql = "UPDATE `birthdates` SET `name`=?, `birthdate`=?, `phonenumber`=? WHERE `id` = ?";
+    $stmt = $link->stmt_init();
+    $stmt->prepare($sql);
+    $stmt->bind_param('sssi', 
+                      $link->real_escape_string($name), 
+                      $link->real_escape_string($birthdate), 
+                      $link->real_escape_string($phonenumber), 
+                      $id);
+    $stmt->execute();
+    mysqli_stmt_close($stmt);
+    $link->close();
+    
+    return $id;
 }
 
 
@@ -60,7 +132,6 @@ function getAllUsers() {
     }
 
     mysqli_stmt_close($stmt);
-    
     return $users;
 }
 
@@ -83,12 +154,35 @@ function getSingleUser($id) {
         $user['email'] = $row['email'];
     }
 	mysqli_stmt_close($stmt);
-	
 	return $user;
 }
 
+function createNewUser($name, $email, $username, $password) {
+    //$first_token = generate_random_string(50);
+    $link = connect_db();
+    $sql = "INSERT INTO  `user` (`name`, `email`, `username`, `password`) VALUES (?, ?, ?, ?)";
+    $stmt = $link->stmt_init();
+    $stmt->prepare($sql);
+    $stmt->bind_param('ssss', 
+                      $link->real_escape_string($name), 
+                      $link->real_escape_string($email), 
+                      $link->real_escape_string($username), 
+                      $link->real_escape_string(sha1($password)));
+    $stmt->execute();
+    $id = $link->insert_id;
+    mysqli_stmt_close($stmt);
+    $link->close();
 
-function getBirthdaysForUser($userid) {
+    if ($id !== 0) {
+        $_SESSION['auth_id'] = $id;
+        //set_cookie('auth_token', $first_token);
+    }
+    
+    return $id;
+}
+
+
+function getBirthdaysForUser($user_id) {
     $response = null;
     $array_today = array();
     $array_upcoming = array();
@@ -98,7 +192,7 @@ function getBirthdaysForUser($userid) {
     $birthdays = array();
 
     $link = connect_db();
-    $sql = "SELECT * FROM `birthdates` WHERE `user_id` = ? ORDER BY MONTH(birthdate), DAYOFMONTH(birthdate)";
+    //$sql = "SELECT * FROM `birthdates` WHERE `user_id` = ? ORDER BY MONTH(birthdate), DAYOFMONTH(birthdate)";
     $sql = "SELECT * 
 ,CASE WHEN BirthdayThisYear>=NOW() THEN BirthdayThisYear ELSE BirthdayThisYear + INTERVAL 1 YEAR END AS NextBirthday
 FROM (
@@ -110,7 +204,7 @@ ORDER BY NextBirthday";
 
     $stmt = $link->stmt_init();
     $stmt->prepare($sql);
-    $stmt->bind_param('i', $userid);
+    $stmt->bind_param('i', $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
 

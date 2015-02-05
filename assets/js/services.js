@@ -1,11 +1,17 @@
 angular.module('app').factory('birthdayFactory', ['$http', function($http) {
     var dataFactory = {};
 
-    dataFactory.getBirthdaysForUser = function (id) {
-        return $http.get('/api/get.php?task=getBirthdaysForUser&id='+id);
+    dataFactory.getBirthdaysForUser = function () {
+        return $http.get('/api/get.php?task=getBirthdaysForUser');
     };
-    dataFactory.insertBirthday = function (birthday, id) {
-        return $http.get('/api/get.php?task=insertBirthday&name='+birthday.name+'&birthdate='+birthday.birthdate+'&phonenumber='+birthday.phonenumber+'&user_id='+id);
+    dataFactory.getSingleBirthday = function (id) {
+        return $http.get('/api/get.php?task=getSingleBirthday&id='+id);
+    };
+    dataFactory.insertBirthday = function (birthday) {
+        return $http.get('/api/get.php?task=insertBirthday&name='+birthday.name+'&birthdate='+birthday.birthdate+'&phonenumber='+birthday.phonenumber);
+    };
+    dataFactory.editBirthday = function (birthday) {
+        return $http.get('/api/get.php?task=editBirthday&id='+birthday.id+'&name='+birthday.name+'&birthdate='+birthday.birthdate+'&phonenumber='+birthday.phonenumber);
     };
 
     return dataFactory;

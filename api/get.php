@@ -15,11 +15,18 @@ if (isset($_GET['task'])) {
 
 		/* Begin if statements determining what to do */
 		if ($task == "getBirthdaysForUser") {
-			$response = getBirthdaysForUser($id);
+			$response = getBirthdaysForUser($_SESSION['auth_id']);
+		}
+		else if ($task == "getSingleBirthday") {
+			$response = getSingleBirthday($id);
 		}
 		else if ($task == "insertBirthday") {
-			if ($_GET['name'] !== "" && $_GET['birthdate'] !== "" && $_GET['phonenumber'] !== "" && $_GET['user_id'] !== "")
-			$response = insertBirthday($_GET['name'], $_GET['birthdate'], $_GET['phonenumber'], $_GET['user_id']);
+			if ($_GET['name'] !== "" && $_GET['birthdate'] !== "" && $_GET['phonenumber'] !== "")
+			$response = insertBirthday($_GET['name'], $_GET['birthdate'], $_GET['phonenumber']);
+		}
+		else if ($task == "editBirthday") {
+			if ($_GET['id'] !== "" && $_GET['name'] !== "" && $_GET['birthdate'] !== "" && $_GET['phonenumber'] !== "")
+			$response = editBirthday($_GET['id'], $_GET['name'], $_GET['birthdate'], $_GET['phonenumber']);
 		}
 		else {
 			$response['message'] = "Invalid task.";
