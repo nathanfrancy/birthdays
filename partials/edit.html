@@ -19,11 +19,12 @@
 			    <label>Phone Number</label>
 			    <input ng-model="birthday.phonenumber" type="text" class="form-control" placeholder="Enter phone number">
 			  </div>
-			  <button ng-click="submitEdit(birthday)" class="btn btn-primary">Save Changes</button>
+			  <button ng-click="submitEdit(birthday)" class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span> Save Changes</button>
+			  <button ng-click="deleteBirthday(birthday)" class="btn btn-danger pull-right"><span class="glyphicon glyphicon-remove"></span> Delete</button>
 			</form>
 		</div>
 	</div>
 	<br><br><br>
-	<a href="#/home" class="btn btn-default btn-sm">Back</a>
+	<a href="#/home" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
 	<br><br><br>
 </div>

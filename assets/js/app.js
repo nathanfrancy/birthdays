@@ -24,3 +24,25 @@ $routeProvider
     
     .otherwise({redirectTo: '/home'})
 });
+
+app.controller('NavBarController', function ($scope, $log, $location) {
+    $scope.navbarCollapsed = true;
+    
+    $scope.isActive = function (viewLocation) { 
+        return $location.path().indexOf(viewLocation) == 0;
+    };
+    
+    $scope.status = {
+        isopen: false
+    };
+
+    $scope.toggled = function(open) {
+        $log.log('Dropdown is now: ', open);
+    };
+
+    $scope.toggleDropdown = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.status.isopen = !$scope.status.isopen;
+    };
+});

@@ -13,6 +13,9 @@ angular.module('app').factory('birthdayFactory', ['$http', function($http) {
     dataFactory.editBirthday = function (birthday) {
         return $http.get('/api/get.php?task=editBirthday&id='+birthday.id+'&name='+birthday.name+'&birthdate='+birthday.birthdate+'&phonenumber='+birthday.phonenumber);
     };
+    dataFactory.deleteBirthday = function (id) {
+        return $http.get('/api/get.php?task=deleteBirthday&id='+id);
+    };
 
     return dataFactory;
 }]);

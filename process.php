@@ -66,8 +66,9 @@ if ($task !== null && $task !== "") {
             }
             $email_body .= "</ul>";
         }
-        else { $email_body .= "<i>No other birthdays this month.</i>\n\n\n<hr>"; }
+        else { $email_body .= "<i>No other birthdays this month.</i>"; }
         
+        $email_body .= "<br><br><hr><a href='http://www.birthday-memo.com/app.php'>Return to web interface</a><br>";
         $email_body .= "\r\n\r\n<i>Processed: " . $today_date . "</i><hr>";
         $email_body .= "</body></html>";
 
@@ -88,7 +89,7 @@ if ($task !== null && $task !== "") {
         if ($task === "run") {
             $mailed = mail($user['email'], $subject, $email_body, $headers);
 
-            if ($mailed) { echo "Mailed successfully.\n\n"; }
+            if ($mailed) { echo "Mailed successfully to ". $user['username'] . "[". $user['id'] ."]"; }
             else { echo "An error occurred in the email.\n\n"; }
         }
     }

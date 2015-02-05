@@ -1,5 +1,8 @@
 <div class="container">
-	<h1 class="page-header">Your Birthdays</h1>
+	<h1 class="page-header">
+		Your Birthdays&nbsp;
+		<a href="#/add" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add</a>
+	</h1>
 	<div class="row">
 		<div class="col-sm-12">
 			<div class="panel panel-default">
@@ -21,7 +24,10 @@
 							<td>{{ bday.name }}</td>
 							<td>{{ bday.birthday }}</td>
 							<td>{{ bday.phonenumber }}</td>
-							<td><a href="#/edit/{{ bday.id }}">Edit</a></td>
+							<td>
+								<a href="#/edit/{{ bday.id }}">Edit</a>&nbsp;
+								<a href="#" ng-click="deleteBirthday(bday)">Delete</a>
+							</td>
 						</tr>
 					</table>
 				</div>
@@ -46,7 +52,10 @@
 							<td>{{ bday.name }}</td>
 							<td>{{ bday.birthday }}</td>
 							<td>{{ bday.phonenumber }}</td>
-							<td><a href="#/edit/{{ bday.id }}">Edit</a></td>
+							<td>
+								<a href="#/edit/{{ bday.id }}">Edit</a>&nbsp;
+								<a href="#" ng-click="deleteBirthday(bday)">Delete</a>
+							</td>
 						</tr>
 					</table>
 				</div>
@@ -71,7 +80,10 @@
 							<td>{{ bday.name }}</td>
 							<td>{{ bday.birthday }}</td>
 							<td>{{ bday.phonenumber }}</td>
-							<td><a href="#/edit/{{ bday.id }}">Edit</a></td>
+							<td>
+								<a href="#/edit/{{ bday.id }}">Edit</a>&nbsp;
+								<a href="#" ng-click="deleteBirthday(bday)">Delete</a>
+							</td>
 						</tr>
 					</table>
 				</div>

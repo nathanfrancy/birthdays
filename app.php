@@ -1,6 +1,9 @@
 <?php 
 session_start();
-if (!isset($_SESSION['auth_id'])) { header("Location: index.php"); } ?>
+if (!isset($_SESSION['auth_id'])) { header("Location: index.php"); }
+require('data-access/dao.php');
+$user = getSingleUser($_SESSION['auth_id']);
+?>
 
 <!DOCTYPE html>
 <html lang="en" ng-app="app">

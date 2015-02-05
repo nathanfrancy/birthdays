@@ -28,6 +28,9 @@ if (isset($_GET['task'])) {
 			if ($_GET['id'] !== "" && $_GET['name'] !== "" && $_GET['birthdate'] !== "" && $_GET['phonenumber'] !== "")
 			$response = editBirthday($_GET['id'], $_GET['name'], $_GET['birthdate'], $_GET['phonenumber']);
 		}
+		else if ($task == "deleteBirthday") {
+			$response = deleteBirthday($id);
+		}
 		else {
 			$response['message'] = "Invalid task.";
 		}

@@ -109,6 +109,19 @@ function editBirthday($id, $name, $birthdate, $phonenumber) {
     return $id;
 }
 
+function deleteBirthday($id) {
+    $link = connect_db();
+    $sql = "DELETE FROM `birthdates` WHERE `id` = ?";
+    $stmt = $link->stmt_init();
+    $stmt->prepare($sql);
+    $stmt->bind_param('i',
+                      $id);
+    $stmt->execute();
+    mysqli_stmt_close($stmt);
+    $link->close();
+    return $id;
+}
+
 
 function getAllUsers() {
     $users = array();

@@ -20,6 +20,17 @@ app.controller('HomeCtrl', function ($scope, $log, $location, birthdayFactory, a
         .error(function (error) {
             alertService.alert("Couldn't load birthdays.", "danger", 3);
         });
+
+    $scope.deleteBirthday = function(birthday) {
+        birthdayFactory.deleteBirthday(birthday.id)
+            .success(function (data) {
+                alertService.alert("Successfully deleted birthday.", "success", 3);
+                $location.path("#/home");
+            })
+            .error(function (error) {
+                alertService.alert("Couldn't delete birthday.", "danger", 3);
+            });
+    }
 });
 
 app.controller('AddCtrl', function ($scope, $log, $location, birthdayFactory, alertService) {
@@ -53,6 +64,17 @@ app.controller('EditCtrl', function ($scope, $log, $location, $routeParams, birt
             })
             .error(function (error) {
                 alertService.alert("Couldn't save birthday.", "danger", 3);
+            });
+    }
+
+    $scope.deleteBirthday = function(birthday) {
+        birthdayFactory.deleteBirthday(birthday.id)
+            .success(function (data) {
+                alertService.alert("Successfully deleted birthday.", "success", 3);
+                $location.path("#/home");
+            })
+            .error(function (error) {
+                alertService.alert("Couldn't delete birthday.", "danger", 3);
             });
     }
 });
